@@ -1,12 +1,8 @@
 package com.app.parking.services;
 
 import com.app.parking.dto.ContactMessageCreateRequest;
-import com.app.parking.dto.ReservationCreateRequest;
 import com.app.parking.entity.ContactMessage;
-import com.app.parking.entity.Reservation;
 import com.app.parking.repository.ContactMessageRepository;
-import com.app.parking.repository.ReservationRepository;
-import com.app.parking.util.enums.ReservationStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

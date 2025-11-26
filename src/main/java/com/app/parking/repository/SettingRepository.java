@@ -7,7 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface SettingsRepository extends JpaRepository<Setting, Long> {
+public interface SettingRepository extends JpaRepository<Setting, Long> {
 
     Optional<Setting> findByKeyName(String keyName);
+
 }

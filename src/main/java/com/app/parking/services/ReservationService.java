@@ -1,14 +1,10 @@
 package com.app.parking.services;
 
-import com.app.parking.dto.ContactMessageCreateRequest;
 import com.app.parking.dto.ReservationCreateRequest;
-import com.app.parking.entity.ContactMessage;
 import com.app.parking.entity.Reservation;
-import com.app.parking.repository.ContactMessageRepository;
 import com.app.parking.repository.ReservationRepository;
 import com.app.parking.util.enums.ReservationStatus;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -43,10 +39,6 @@ public class ReservationService {
 
     public void delete(Long id) {
         repository.deleteById(id);
-    }
-
-    public List<Reservation> findByUserId(Long userId) {
-        return repository.findByUserId(userId);
     }
 
     public List<Reservation> findOverlappingReservations(LocalDateTime start, LocalDateTime end) {

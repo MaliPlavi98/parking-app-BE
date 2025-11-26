@@ -1,24 +1,38 @@
 package com.app.parking.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 
 public record ReservationCreateRequest(
-        @NotBlank String name,
-        @NotBlank String email,
-        @NotBlank String phone,
+        @NotBlank
+        @Size(max = 255)
+        String name,
 
-        // OPTIONAL
+        @NotBlank
+        @Size(max = 255)
+        String email,
+
+        @NotBlank
+        @Size(max = 50)
+        String phone,
+
+        @Size(max = 20)
         String carPlate,
+
+        @Size(max = 20)
         String returnFlightNumber,
+
+        @Min(1) @Max(10)
         Integer passengers,
+
         Boolean shuttleRequested,
 
-        // REQUIRED
-        @NotNull LocalDateTime startTime,
-        @NotNull LocalDateTime endTime
+        @NotNull
+        LocalDateTime startTime,
+
+        @NotNull
+        LocalDateTime endTime
 ) {
 }
 

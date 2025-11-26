@@ -12,14 +12,12 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    List<Reservation> findByUserId(Long userId);
-
-    @Query("SELECT r FROM ParkingReservation r WHERE r.start < :end AND r.end > :start")
+    @Query("""
+            SELECT r FROM Reservation r
+            WHERE r.startTime < :end
+              AND r.endTime > :start
+            """)
     List<Reservation> findOverlappingReservations(LocalDateTime start, LocalDateTime end);
-
-    boolean existsByParkingSpotIdAndStartBeforeAndEndAfter(
-            Long spotId, LocalDateTime end, LocalDateTime start
-    );
 
     List<Reservation> findByStatus(ReservationStatus status);
 
