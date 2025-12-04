@@ -1,4 +1,4 @@
-package com.app.parking.security.service;
+package com.app.parking.services;
 
 import com.app.parking.dto.AvailabilityRequest;
 import com.app.parking.dto.AvailabilityResponse;

@@ -4,7 +4,7 @@ import com.app.parking.dto.AvailabilityRequest;
 import com.app.parking.dto.AvailabilityResponse;
 import com.app.parking.dto.ReservationCreateRequest;
 import com.app.parking.entity.Reservation;
-import com.app.parking.security.service.AvailabilityService;
+import com.app.parking.services.AvailabilityService;
 import com.app.parking.services.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

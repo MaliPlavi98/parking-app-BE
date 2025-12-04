@@ -1,4 +1,4 @@
-package com.app.parking.security.service;
+package com.app.parking.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

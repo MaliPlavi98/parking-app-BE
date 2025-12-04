@@ -5,6 +5,7 @@ import com.app.parking.entity.Reservation;
 import com.app.parking.repository.ReservationRepository;
 import com.app.parking.util.enums.ReservationStatus;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,9 +17,31 @@ public class ReservationService {
 
     private final ReservationRepository repository;
 
-    public Reservation createReservation(ReservationCreateRequest req) {
+    public Reservation createReservation(@NotNull ReservationCreateRequest req) {
 
         Reservation reservation = new Reservation();
+
+        reservation.setName(req.name());
+        reservation.setEmail(req.email());
+        reservation.setPhone(req.phone());
+
+        // Optional fields
+        reservation.setCarPlate(req.carPlate());
+        reservation.setReturnFlightNumber(req.returnFlightNumber());
+        reservation.setPassengers(req.passengers());
+        reservation.setShuttleRequested(req.shuttleRequested());
+
+        // Required fields
+        reservation.setStartTime(req.startTime());
+        reservation.setEndTime(req.endTime());
+
+        return repository.save(reservation);
+    }
+
+    public Reservation updateReservation(Long id, @NotNull ReservationCreateRequest req) {
+
+        Reservation reservation = repository.findById(id)
+                                            .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
         reservation.setName(req.name());
         reservation.setEmail(req.email());

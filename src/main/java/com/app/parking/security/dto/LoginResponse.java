@@ -1,4 +1,6 @@
 package com.app.parking.security.dto;
 
-public record LoginResponse(String token) {
+import com.app.parking.entity.User;
+
+public record LoginResponse(String token, UserDto userDto) {
 }

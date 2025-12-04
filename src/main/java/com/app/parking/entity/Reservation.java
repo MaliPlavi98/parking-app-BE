@@ -29,6 +29,7 @@ public class Reservation {
 
     // Flight info
     private String returnFlightNumber;
+    
     private int passengers;
 
     // Reservation time window
