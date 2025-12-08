@@ -26,36 +26,68 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private CustomUserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
+    protected void doFilterInternal(@NotNull HttpServletRequest request,
                                     @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        // 🔍 1. Extract JWT token from cookies (not from Authorization header)
+        String token = extractTokenFromCookie(request);
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-
-            String token = authHeader.substring(7);
+        if (token != null) {  // If a token exists in cookies
+            // 🧩 2. Extract the username from the JWT
             String username = jwtUtil.extractUsername(token);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // 🛡 3. Check:
+            // - username is valid
+            // - no authentication is yet set for this request
+            // - the token is not expired, and signature is valid
+            if (username != null
+                    && SecurityContextHolder.getContext().getAuthentication() == null
+                    && jwtUtil.isValid(token)) {
 
-                if (jwtUtil.isValid(token)) {
+                // 👤 4. Load user details from the database (or another source)
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                // 🔐 5. Create an authentication object with user's authorities
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,     // principal (user)
+                                null,            // no password needed here
+                                userDetails.getAuthorities()   // roles/permissions
+                        );
 
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities()
-                            );
+                // 🌍 6. Attach details like IP address, session ID, user agent, etc.
+                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+                // ✅ 7. Mark user as authenticated for this request
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
 
+        // ▶ 8. Continue the filter chain (Spring will proceed with the request)
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * Extracts JWT token from cookies.
+     * We look for a cookie named "token".
+     */
+    private String extractTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+
+        // Loop through all cookies in the request
+        for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+
+            // If there is a cookie named "token"
+            if ("token".equals(cookie.getName())) {
+
+                // return its value (the JWT)
+                return cookie.getValue();
+            }
+        }
+
+        // No token cookie found
+        return null;
     }
 }
