@@ -90,4 +90,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // No token cookie found
         return null;
     }
+
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        System.out.println("shouldNotFilter? uri=" + uri);
+        boolean skip = uri.startsWith("/auth")
+                || uri.startsWith("/h2-console")
+                || uri.startsWith("/api/reservation/check");
+        System.out.println("skipJwt=" + skip);
+        return skip;
+    }
+
+
 }

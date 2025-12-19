@@ -3,14 +3,16 @@ package com.app.parking.services;
 import com.app.parking.dto.SettingRequest;
 import com.app.parking.entity.Setting;
 import com.app.parking.repository.SettingRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SettingService {
 
-    SettingRepository settingRepository;
+    private final SettingRepository settingRepository;
 
     public int getParkingCapacity() {
         return Integer.parseInt(

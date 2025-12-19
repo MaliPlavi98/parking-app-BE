@@ -2,9 +2,10 @@ package com.app.parking.dto;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
+
+import java.time.OffsetDateTime;
 
 public record AvailabilityRequest(
-        @NotNull LocalDateTime startTime,
-        @NotNull LocalDateTime endTime) {
+        @NotNull OffsetDateTime startTime,
+        @NotNull OffsetDateTime endTime) {
 }

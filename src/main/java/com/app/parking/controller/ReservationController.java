@@ -38,6 +38,11 @@ public class ReservationController {
     @PostMapping("/check")
     public AvailabilityResponse checkAvailability(
             @Valid @RequestBody AvailabilityRequest request) {
+
+        if (request.endTime().isBefore(request.startTime())) {
+            throw new IllegalArgumentException("End time must be after start time");
+        }
+        
         return availabilityService.checkAvailability(request);
     }
 

@@ -20,8 +20,8 @@ public class AvailabilityService {
 
     public AvailabilityResponse checkAvailability(AvailabilityRequest req) {
 
-        LocalDateTime start = req.startTime();
-        LocalDateTime end = req.endTime();
+        LocalDateTime start = req.startTime().toLocalDateTime();
+        LocalDateTime end = req.endTime().toLocalDateTime();
 
         // Validate
         if (end.isBefore(start)) {
