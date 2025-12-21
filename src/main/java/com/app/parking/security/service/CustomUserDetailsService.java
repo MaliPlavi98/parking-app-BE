@@ -10,8 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-
-
+    
     @Autowired
     private UserRepository userRepository;
 
@@ -25,6 +24,5 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .roles(user.getRole().name())
                 .build();
     }
-
 
 }

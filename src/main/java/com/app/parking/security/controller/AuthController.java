@@ -8,7 +8,9 @@ import com.app.parking.security.dto.UserDto;
 import com.app.parking.security.jwt.JwtUtil;
 import com.app.parking.security.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -21,24 +23,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+    private final UserService userService;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    @Value("${app.cookie.secure}")
+    private boolean cookieSecure;
 
-    @Autowired
-    private UserService userService;
+    @Value("${app.cookie.same-site}")
+    private String sameSite;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.username(),
-                        request.password()
-                )
+                new UsernamePasswordAuthenticationToken(request.username(), request.password())
         );
 
         // Load user from DB
@@ -54,8 +55,8 @@ public class AuthController {
         String token = jwtUtil.generateToken(request.username());
 
         ResponseCookie responseCookie = ResponseCookie.from("token", token).httpOnly(true)
-                                                      .secure(true)
-                                                      .sameSite("None")
+                                                      .secure(cookieSecure)
+                                                      .sameSite(sameSite)
                                                       .path("/")
                                                       .maxAge(7 * 24 * 60 * 60)
                                                       .build();
@@ -76,8 +77,8 @@ public class AuthController {
     public ResponseEntity<?> logout() {
         ResponseCookie deleteCookie = ResponseCookie.from("token", "")
                                                     .httpOnly(true)
-                                                    .secure(true)       // true in production
-                                                    .sameSite("None")    // required for cross-origin
+                                                    .secure(cookieSecure)       // true in production
+                                                    .sameSite(sameSite)    // required for cross-origin
                                                     .path("/")
                                                     .maxAge(0)           // <-- delete cookie
                                                     .build();
