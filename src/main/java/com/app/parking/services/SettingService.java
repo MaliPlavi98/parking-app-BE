@@ -3,10 +3,12 @@ package com.app.parking.services;
 import com.app.parking.dto.SettingRequest;
 import com.app.parking.entity.Setting;
 import com.app.parking.repository.SettingRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,21 +39,33 @@ public class SettingService {
 
     public Setting create(SettingRequest request) {
 
-        // TODO Add logic of creating setting
+        Setting setting = new Setting();
 
-        return settingRepository.save(null);
+        setting.setKeyName(request.key());
+        setting.setValue(request.value());
+
+        return settingRepository.save(setting);
     }
 
     public Setting update(Long id, SettingRequest settingRequest) {
-
-        // TODO Add logic for updating setting
-
-        return settingRepository.save(null);
+        return settingRepository.findById(id)
+                                .map(setting -> {
+                                    setting.setKeyName(settingRequest.key());
+                                    setting.setValue(settingRequest.value());
+                                    return settingRepository.save(setting);
+                                })
+                                .orElseThrow(() -> new EntityNotFoundException(
+                                        "Setting not found with id: " + id
+                                ));
     }
 
     public void delete(Long id) {
         settingRepository.deleteById(id);
     }
 
+    public Setting getSettingByKeyName(String key) {
+        return settingRepository.findByKeyName(key)
+                                .orElseThrow(() -> new RuntimeException("Setting not available"));
 
+    }
 }

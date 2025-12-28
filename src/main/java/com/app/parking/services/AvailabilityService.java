@@ -7,6 +7,7 @@ import com.app.parking.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,8 +21,8 @@ public class AvailabilityService {
 
     public AvailabilityResponse checkAvailability(AvailabilityRequest req) {
 
-        LocalDateTime start = req.startTime().toLocalDateTime();
-        LocalDateTime end = req.endTime().toLocalDateTime();
+        Instant start = req.startTime().toInstant();
+        Instant end = req.endTime().toInstant();
 
         // Validate
         if (end.isBefore(start)) {

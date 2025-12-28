@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -29,18 +30,18 @@ public class Reservation {
 
     // Flight info
     private String returnFlightNumber;
-    
+
     private int passengers;
 
     // Reservation time window
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private Instant startTime;
+    private Instant endTime;
 
     // Pricing
     private double totalPrice;
 
-    // Shuttle
-    private boolean shuttleRequested;
+    // Details
+    private String details;
 
     // Reservation status
     @Enumerated(EnumType.STRING)

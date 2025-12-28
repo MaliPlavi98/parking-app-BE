@@ -1,9 +1,8 @@
 package com.app.parking.controller;
 
-import com.app.parking.dto.AvailabilityRequest;
-import com.app.parking.dto.AvailabilityResponse;
-import com.app.parking.dto.ReservationCreateRequest;
+import com.app.parking.dto.*;
 import com.app.parking.entity.Reservation;
+import com.app.parking.entity.Setting;
 import com.app.parking.services.AvailabilityService;
 import com.app.parking.services.ReservationService;
 import jakarta.validation.Valid;
@@ -35,6 +34,14 @@ public class ReservationController {
         reservationService.delete(id);
     }
 
+    // UPDATE a setting by ID
+    @PutMapping("/{id}")
+    public Reservation updateReservation(
+            @PathVariable Long id,
+            @RequestBody ReservationUpdateRequest request) {
+        return reservationService.updateReservation(id, request);
+    }
+
     @PostMapping("/check")
     public AvailabilityResponse checkAvailability(
             @Valid @RequestBody AvailabilityRequest request) {
@@ -42,7 +49,7 @@ public class ReservationController {
         if (request.endTime().isBefore(request.startTime())) {
             throw new IllegalArgumentException("End time must be after start time");
         }
-        
+
         return availabilityService.checkAvailability(request);
     }
 

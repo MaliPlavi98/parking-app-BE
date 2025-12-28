@@ -3,6 +3,8 @@ package com.app.parking.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -12,9 +14,9 @@ public class PricingService {
 
     private final SettingService settingService;
 
-    public double calculatePrice(LocalDateTime start, LocalDateTime end) {
+    public double calculatePrice(Instant start, Instant end) {
 
-        long days = ChronoUnit.DAYS.between(start.toLocalDate(), end.toLocalDate());
+        long days = ChronoUnit.DAYS.between(start, end);
 
         // Minimum 1 day
         if (days == 0) {
@@ -24,8 +26,13 @@ public class PricingService {
         return days * settingService.getDailyPrice();
     }
 
-    public long calculateDays(LocalDateTime start, LocalDateTime end) {
-        long days = ChronoUnit.DAYS.between(start.toLocalDate(), end.toLocalDate());
-        return days == 0 ? 1 : days;
+    public long calculateDays(Instant start, Instant end) {
+        if (end.isBefore(start)) {
+            throw new IllegalArgumentException("End before start");
+        }
+
+        long minutes = Duration.between(start, end).toMinutes();
+        return (long) Math.ceil(minutes / 1440.0);
     }
+
 }

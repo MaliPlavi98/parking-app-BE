@@ -59,8 +59,16 @@ public class SecurityConfig {
                     .requestMatchers("/h2-console/**").permitAll()
                     .requestMatchers("/auth/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/reservation/check").permitAll()
+                    .requestMatchers("/error").permitAll()
                     .requestMatchers("/api/contact/**").hasRole("ADMIN")
-                    .requestMatchers("/api/setting/**").hasRole("ADMIN")
+                    // ✅ PUBLIC READ access
+                    .requestMatchers(HttpMethod.GET, "/api/setting/**").permitAll()
+
+                    // 🔒 ADMIN WRITE access
+                    .requestMatchers(HttpMethod.POST, "/api/setting/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/api/setting/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/api/setting/**").hasRole("ADMIN")
+
                     .requestMatchers("/api/reservation/**").hasRole("ADMIN")
                     .anyRequest().authenticated())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

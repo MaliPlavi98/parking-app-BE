@@ -1,13 +1,16 @@
 package com.app.parking.services;
 
 import com.app.parking.dto.ReservationCreateRequest;
+import com.app.parking.dto.ReservationUpdateRequest;
 import com.app.parking.entity.Reservation;
 import com.app.parking.repository.ReservationRepository;
 import com.app.parking.util.enums.ReservationStatus;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,7 +32,8 @@ public class ReservationService {
         reservation.setCarPlate(req.carPlate());
         reservation.setReturnFlightNumber(req.returnFlightNumber());
         reservation.setPassengers(req.passengers());
-        reservation.setShuttleRequested(req.shuttleRequested());
+        reservation.setDetails(req.details());
+        reservation.setTotalPrice(req.totalPrice());
 
         // Required fields
         reservation.setStartTime(req.startTime());
@@ -38,7 +42,7 @@ public class ReservationService {
         return repository.save(reservation);
     }
 
-    public Reservation updateReservation(Long id, @NotNull ReservationCreateRequest req) {
+    public Reservation updateReservation(Long id, @NotNull ReservationUpdateRequest req) {
 
         Reservation reservation = repository.findById(id)
                                             .orElseThrow(() -> new RuntimeException("Reservation not found"));
@@ -51,11 +55,8 @@ public class ReservationService {
         reservation.setCarPlate(req.carPlate());
         reservation.setReturnFlightNumber(req.returnFlightNumber());
         reservation.setPassengers(req.passengers());
-        reservation.setShuttleRequested(req.shuttleRequested());
-
-        // Required fields
-        reservation.setStartTime(req.startTime());
-        reservation.setEndTime(req.endTime());
+        reservation.setDetails(req.details());
+        reservation.setStatus(req.reservationStatus());
 
         return repository.save(reservation);
     }
@@ -64,7 +65,7 @@ public class ReservationService {
         repository.deleteById(id);
     }
 
-    public List<Reservation> findOverlappingReservations(LocalDateTime start, LocalDateTime end) {
+    public List<Reservation> findOverlappingReservations(Instant start, Instant end) {
         return repository.findOverlappingReservations(start, end);
     }
 
@@ -73,6 +74,6 @@ public class ReservationService {
     }
 
     public List<Reservation> getAll() {
-        return repository.findAll();
+        return repository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 }

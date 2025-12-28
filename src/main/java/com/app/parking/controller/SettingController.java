@@ -21,6 +21,12 @@ public class SettingController {
         return settingService.getAll();
     }
 
+    // GET all settings
+    @GetMapping("/{key}")
+    public Setting getSettingByKeyName(@PathVariable String key) {
+        return settingService.getSettingByKeyName(key);
+    }
+
     // CREATE a new setting
     @PostMapping
     public Setting createSetting(@RequestBody SettingRequest request) {

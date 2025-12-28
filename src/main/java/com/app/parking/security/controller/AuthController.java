@@ -68,10 +68,18 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        // Create user + save to DB
+
+        if (!request.password().equals(request.confirmPassword())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Passwords do not match");
+        }
+
         userService.register(request.username(), request.password());
+
         return ResponseEntity.ok("Registered");
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {

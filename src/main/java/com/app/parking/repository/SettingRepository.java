@@ -10,5 +10,4 @@ import java.util.Optional;
 public interface SettingRepository extends JpaRepository<Setting, Long> {
 
     Optional<Setting> findByKeyName(String keyName);
-
 }

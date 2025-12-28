@@ -35,34 +35,47 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = extractTokenFromCookie(request);
 
         if (token != null) {  // If a token exists in cookies
-            // 🧩 2. Extract the username from the JWT
-            String username = jwtUtil.extractUsername(token);
 
-            // 🛡 3. Check:
-            // - username is valid
-            // - no authentication is yet set for this request
-            // - the token is not expired, and signature is valid
-            if (username != null
-                    && SecurityContextHolder.getContext().getAuthentication() == null
-                    && jwtUtil.isValid(token)) {
+            try {
 
-                // 👤 4. Load user details from the database (or another source)
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                // 🔐 5. Create an authentication object with user's authorities
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,     // principal (user)
-                                null,            // no password needed here
-                                userDetails.getAuthorities()   // roles/permissions
-                        );
+                // 🧩 2. Extract the username from the JWT
+                String username = jwtUtil.extractUsername(token);
 
-                // 🌍 6. Attach details like IP address, session ID, user agent, etc.
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // 🛡 3. Check:
+                // - username is valid
+                // - no authentication is yet set for this request
+                // - the token is not expired, and signature is valid
+                if (username != null
+                        && SecurityContextHolder.getContext().getAuthentication() == null
+                        && jwtUtil.isValid(token)) {
 
-                // ✅ 7. Mark user as authenticated for this request
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                    // 👤 4. Load user details from the database (or another source)
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                    // 🔐 5. Create an authentication object with user's authorities
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,     // principal (user)
+                                    null,            // no password needed here
+                                    userDetails.getAuthorities()   // roles/permissions
+                            );
+
+                    // 🌍 6. Attach details like IP address, session ID, user agent, etc.
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    // ✅ 7. Mark user as authenticated for this request
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+
+            } catch (io.jsonwebtoken.ExpiredJwtException ex) {
+                // ✅ Token expired → user becomes anonymous
+                SecurityContextHolder.clearContext();
+            } catch (Exception ex) {
+                // ✅ Any JWT issue → ignore authentication
+                SecurityContextHolder.clearContext();
             }
+
         }
 
         // ▶ 8. Continue the filter chain (Spring will proceed with the request)
@@ -98,6 +111,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         return uri.startsWith("/auth")
                 || uri.startsWith("/h2-console")
+                || (request.getMethod().equals("GET") && uri.startsWith("/api/setting"))
                 || uri.startsWith("/api/reservation/check");
     }
 
