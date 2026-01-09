@@ -1,17 +1,11 @@
 package com.app.parking.security.config;
 
-import com.app.parking.entity.User;
-import com.app.parking.repository.UserRepository;
 import com.app.parking.security.jwt.JwtAuthFilter;
-import com.app.parking.security.service.CustomAuthenticationProvider;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -57,20 +51,27 @@ public class SecurityConfig {
             //            .authenticationManager(authManager)
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/h2-console/**").permitAll()
-                    .requestMatchers("/auth/**").permitAll()
+
+                    // 🔓 PUBLIC AUTH endpoints
+                    .requestMatchers("/auth/login", "/auth/register", "/auth/logout").permitAll()
+
+                    // 🔒 AUTHENTICATED endpoint
+                    .requestMatchers("/auth/me").authenticated()
+
                     .requestMatchers(HttpMethod.POST, "/api/reservation/check").permitAll()
                     .requestMatchers("/error").permitAll()
-                    .requestMatchers("/api/contact/**").hasRole("ADMIN")
-                    // ✅ PUBLIC READ access
-                    .requestMatchers(HttpMethod.GET, "/api/setting/**").permitAll()
 
-                    // 🔒 ADMIN WRITE access
+                    .requestMatchers("/api/contact/**").hasRole("ADMIN")
+
+                    .requestMatchers(HttpMethod.GET, "/api/setting/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/setting/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PUT, "/api/setting/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/api/setting/**").hasRole("ADMIN")
 
                     .requestMatchers("/api/reservation/**").hasRole("ADMIN")
-                    .anyRequest().authenticated())
+
+                    .anyRequest().authenticated()
+            )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable);

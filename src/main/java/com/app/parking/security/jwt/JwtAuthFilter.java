@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 import java.io.IOException;
 
@@ -47,7 +48,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 // - no authentication is yet set for this request
                 // - the token is not expired, and signature is valid
                 if (username != null
-                        && SecurityContextHolder.getContext().getAuthentication() == null
+                        && (SecurityContextHolder.getContext().getAuthentication() == null
+                        || SecurityContextHolder.getContext().getAuthentication()
+                        instanceof AnonymousAuthenticationToken)
                         && jwtUtil.isValid(token)) {
 
                     // 👤 4. Load user details from the database (or another source)
@@ -109,7 +112,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
 
-        return uri.startsWith("/auth")
+        return uri.equals("/auth/login")
+                || uri.equals("/auth/register")
+                || uri.equals("/auth/logout")
                 || uri.startsWith("/h2-console")
                 || (request.getMethod().equals("GET") && uri.startsWith("/api/setting"))
                 || uri.startsWith("/api/reservation/check");
