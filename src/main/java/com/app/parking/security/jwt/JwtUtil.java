@@ -25,7 +25,7 @@ public class JwtUtil {
         return Jwts.builder()
                    .subject(username)
                    .issuedAt(Date.from(now))
-                   .expiration(Date.from(now.plus(30, ChronoUnit.SECONDS)))
+                   .expiration(Date.from(now.plus(1, ChronoUnit.DAYS)))
                    .signWith(getSigningKey())
                    .compact();
     }
