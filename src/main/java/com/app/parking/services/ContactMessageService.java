@@ -32,6 +32,19 @@ public class ContactMessageService {
         repository.deleteById(id);
     }
 
+    public ContactMessage update(Long id, ContactMessageCreateRequest contactMessageCreateRequest) {
+
+        ContactMessage cm = repository.findById(id).orElseThrow(() -> new RuntimeException("ContactMessage not found"));
+
+        cm.setName(contactMessageCreateRequest.name());
+        cm.setMessage(contactMessageCreateRequest.message());
+        cm.setPhone(contactMessageCreateRequest.phone());
+        cm.setTitle(contactMessageCreateRequest.title());
+        cm.setEmail(contactMessageCreateRequest.email());
+
+        return cm;
+    }
+
     public List<ContactMessage> getAll() {
         return repository.findAllByOrderByCreatedAtDesc();
     }

@@ -3,6 +3,7 @@ package com.app.parking.controller;
 
 import com.app.parking.dto.ContactMessageCreateRequest;
 import com.app.parking.entity.ContactMessage;
+import com.app.parking.entity.Reservation;
 import com.app.parking.services.ContactMessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +13,8 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/contact")
 @RequiredArgsConstructor
+@RequestMapping("/api/contact")
 public class ContactMessageController {
 
     private final ContactMessageService service;
@@ -23,13 +24,18 @@ public class ContactMessageController {
         return service.createContactMessage(request);
     }
 
-    @GetMapping
+    @GetMapping("/admin")
     public List<ContactMessage> getAll() {
         return service.getAll();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/{id}")
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    @PutMapping("/admin/{id}")
+    public ContactMessage updateContactMessage(@PathVariable Long id, @RequestBody ContactMessageCreateRequest contactMessageRequest) {
+        return service.update(id, contactMessageRequest);
     }
 }

@@ -16,6 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -45,7 +47,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(@NotNull HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
 
-        http.csrf(AbstractHttpConfigurer::disable)
+        http.csrf(csrf -> csrf
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                    .ignoringRequestMatchers("/auth/login", "/auth/register")
+            )
             .cors(Customizer.withDefaults())
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
             //            .authenticationManager(authManager)
@@ -58,17 +64,16 @@ public class SecurityConfig {
                     // 🔒 AUTHENTICATED endpoint
                     .requestMatchers("/auth/me").authenticated()
 
-                    .requestMatchers(HttpMethod.POST, "/api/reservation/check").permitAll()
+                    // PUBLIC
+                    .requestMatchers("/api/reservation/**").permitAll()
+                    .requestMatchers("/api/setting/**").permitAll()
+                    .requestMatchers("/api/contact/**").permitAll()
                     .requestMatchers("/error").permitAll()
 
-                    .requestMatchers("/api/contact/**").hasRole("ADMIN")
-
-                    .requestMatchers(HttpMethod.GET, "/api/setting/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/setting/**").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.PUT, "/api/setting/**").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.DELETE, "/api/setting/**").hasRole("ADMIN")
-
-                    .requestMatchers("/api/reservation/**").hasRole("ADMIN")
+                    // ADMIN
+                    .requestMatchers("/api/contact/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/api/setting/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/api/reservation/admin/**").hasRole("ADMIN")
 
                     .anyRequest().authenticated()
             )

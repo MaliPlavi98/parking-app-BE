@@ -2,7 +2,6 @@ package com.app.parking.controller;
 
 import com.app.parking.dto.*;
 import com.app.parking.entity.Reservation;
-import com.app.parking.entity.Setting;
 import com.app.parking.services.AvailabilityService;
 import com.app.parking.services.ReservationService;
 import jakarta.validation.Valid;
@@ -24,18 +23,23 @@ public class ReservationController {
         return reservationService.createReservation(request);
     }
 
-    @GetMapping
+    @GetMapping("/admin")
     public List<Reservation> getAll() {
         return reservationService.getAll();
     }
 
-    @DeleteMapping("/{id}")
+    @GetMapping("/{id}")
+    public Reservation getReservationById(@PathVariable Long id) {
+        return reservationService.getReservationById(id);
+    }
+
+    @DeleteMapping("/admin/{id}")
     public void delete(@PathVariable Long id) {
         reservationService.delete(id);
     }
 
     // UPDATE a setting by ID
-    @PutMapping("/{id}")
+    @PutMapping("/admin/{id}")
     public Reservation updateReservation(
             @PathVariable Long id,
             @RequestBody ReservationUpdateRequest request) {

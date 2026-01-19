@@ -65,6 +65,10 @@ public class ReservationService {
         repository.deleteById(id);
     }
 
+    public Reservation getReservationById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new RuntimeException("Reservation not found"));
+    }
+
     public List<Reservation> findOverlappingReservations(Instant start, Instant end) {
         return repository.findOverlappingReservations(start, end);
     }
