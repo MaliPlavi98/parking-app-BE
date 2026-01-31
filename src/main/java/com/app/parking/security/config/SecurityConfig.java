@@ -28,12 +28,6 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // your custom provider
-    //    @Bean
-    //    public AuthenticationManager authenticationManager(CustomAuthenticationProvider customAuthenticationProvider) {
-    //        return new ProviderManager(customAuthenticationProvider);
-    //    }
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
@@ -59,7 +53,7 @@ public class SecurityConfig {
                     .requestMatchers("/h2-console/**").permitAll()
 
                     // 🔓 PUBLIC AUTH endpoints
-                    .requestMatchers("/auth/login", "/auth/register", "/auth/logout").permitAll()
+                    .requestMatchers("/auth/login", "/auth/register", "/auth/logout", "/auth/csrf").permitAll()
 
                     // 🔒 AUTHENTICATED endpoint
                     .requestMatchers("/auth/me").authenticated()
@@ -68,6 +62,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/reservation/**").permitAll()
                     .requestMatchers("/api/setting/**").permitAll()
                     .requestMatchers("/api/contact/**").permitAll()
+                    .requestMatchers("/api/calculate/**").permitAll()
                     .requestMatchers("/error").permitAll()
 
                     // ADMIN
