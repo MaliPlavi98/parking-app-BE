@@ -32,6 +32,14 @@ public class SettingService {
         );
     }
 
+    public double getFirstDayPrice() {
+        return Double.parseDouble(
+                settingRepository.findByKeyName("FIRST_DAY_PRICE")
+                                 .orElseThrow(() -> new RuntimeException("Missing setting: FIRST_DAY_PRICE"))
+                                 .getValue()
+        );
+    }
+
     // Add update method here:
     public List<Setting> getAll() {
         return settingRepository.findAll();

@@ -16,14 +16,23 @@ public class PricingService {
 
     public double calculatePrice(Instant start, Instant end) {
 
+        double dailyPrice = settingService.getDailyPrice();
+        double firstDayPrice = settingService.getFirstDayPrice();
+
         long days = ChronoUnit.DAYS.between(start, end);
 
         // Minimum 1 day
-        if (days == 0) {
+        if (days <= 0) {
             days = 1;
         }
 
-        return days * settingService.getDailyPrice();
+        // First day has special price
+        if (days == 1) {
+            return firstDayPrice;
+        }
+
+        // First day + remaining days
+        return firstDayPrice + (days - 1) * dailyPrice;
     }
 
     public long calculateDays(Instant start, Instant end) {
